@@ -11,7 +11,13 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.18.0",
+    "iview": "^3.1.5",
+    "moment": "^2.22.2",
     "vue": "^2.5.2",
+    "vue-axios": "^2.1.4",
+    "vue-lodash": "^2.0.0",
+    "vue-moment": "^4.0.0",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {
