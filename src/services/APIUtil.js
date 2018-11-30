@@ -8,13 +8,8 @@ export default {
    * 初始化Axios
    */
   init () {
-    /**
-     * 这里可以根据代码的环境来进行切换URL
-     * production => /config/prod.env.js
-     * dev => /config/prod.env.js
-     */
     Vue.axios.defaults.baseURL = 'http://47.107.241.57:8080/Entity/U1c365fdb24129c/hospital/'
-    Vue.axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
+    Vue.axios.defaults.headers.post['Content-Type'] = 'application/json'
     Vue.axios.defaults.timeout = 5000
   },
 
