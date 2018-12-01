@@ -1,29 +1,68 @@
 <template>
-  <Card class="card" title="检查单ID">
+  <Card class="card" title="检查单 - 118037910008">
     <Layout>
-      <Header class="info-header gray-bg">
-        病人基本信息，医生基本信息
-      </Header>
-      <Content class="info-examination-item">检查项目 Table</Content>
-      <Content class="info-examination-result">检查结果 Table</Content>
-      <Content class="info-examination-image">检查图片 3个</Content>
-      <Content class="info-examination-decs">检查描述 texearea</Content>
-      <Footer class="info-operation">按钮 -- 确认/再次检查</Footer>
+      <Content class="info-header gray-bg">
+        <BasicInfo>
+          <div slot="patient-info">
+            <div>患者姓名: 王启航</div>
+            <div>患者年龄: 21</div>
+            <div>患者性别: 男</div>
+            <div>检查单详情: CT检查</div>
+          </div>
+          <div slot="doctor-info">
+            <div>医生姓名: 我是科室医生❤️</div>
+            <div>医生联系方式: 16621004280</div>
+          </div>
+        </BasicInfo>
+      </Content>
+      <Divider>检查结果</Divider>
+      <Content class="info-examination-result">
+        <ExaminationResult @onResultChange="onResultChange"/>
+      </Content>
+      <Footer class="info-operation">
+        <Button type="success" @click="confirm">检查结束</Button>
+        <Button type="warning" @click="reExamination" style="margin-left: 20px">再次检查</Button>
+      </Footer>
     </Layout>
     <p slot="extra">
-      Timer
+      检查时间: 2018/12/02 09:00
     </p>
   </Card>
 </template>
 
 <script>
+import BasicInfo from './basic/BasicInfo'
+import ExaminationResult from './examination/ExaminationResult'
+
 export default {
   name: 'Examination',
+  components: {
+    BasicInfo,
+    ExaminationResult
+  },
   data () {
     return {
     }
   },
   methods: {
+    /**
+     * 确认检查
+     */
+    confirm () {
+
+    },
+
+    /**
+     * 再次检查
+     */
+    reExamination () {
+
+    },
+    /**
+     * 检查结果数据
+     */
+    onResultChange (result) {
+    }
   },
   mounted () {
     // APIUtil.get('Examination', {
@@ -43,21 +82,12 @@ export default {
   @import "../scss/index.css";
 
   .info-header {
-    height: 150px;
-  }
-  .info-examination-item{
-    height: 150px;
+    height: auto;
   }
   .info-examination-result{
-    height: 150px;
-  }
-  .info-examination-image {
-    height: 150px;
-  }
-  .info-examination-decs{
-    height: 150px;
+    height: auto;
   }
   .info-operation{
-    height: 20px;
+    height: auto;
   }
 </style>
