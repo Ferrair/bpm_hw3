@@ -34,13 +34,13 @@ export default {
           title: '数量 (盒/支)',
           width: 150,
           key: 'number',
-          render: (dom, params) => {
+          render: (createElement, params) => {
             /**
              * dom DOM元素
              * params: index, row, column的数据
              */
-            return dom('div', [
-              dom('InputNumber', {
+            return createElement('div', [
+              createElement('InputNumber', {
                 props: {
                   size: 'small'
                 },

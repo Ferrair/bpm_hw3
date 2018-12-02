@@ -9,7 +9,7 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/visit',
+      path: '/visit/:id?',
       name: 'Visit',
       component: Visit
     },
@@ -19,7 +19,7 @@ export default new Router({
       component: Home
     },
     {
-      path: '/examination',
+      path: '/examination/:id?',
       name: 'Examination',
       component: Examination
     }

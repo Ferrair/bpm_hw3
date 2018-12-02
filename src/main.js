@@ -22,8 +22,8 @@ APIUtil.init()
 /*
  * register global filter
  */
-Vue.filter('beijing', function (utcTime) {
-  return Util.timeFormatter(utcTime)
+Vue.filter('beijing', function (utcTimeStamp) {
+  return Util.timeStampFormatter(utcTimeStamp * 1000)
 })
 
 /* eslint-disable no-new */

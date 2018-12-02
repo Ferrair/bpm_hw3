@@ -1,7 +1,5 @@
 import Vue from 'vue'
 
-let qs = require('qs')
-
 export default {
 
   /**
@@ -24,7 +22,7 @@ export default {
       method: 'post',
       url: url,
       // 对象变点  device[id] => device.id
-      data: qs.stringify(data, {allowDots: true})
+      data: data
     })
   },
 
@@ -38,7 +36,7 @@ export default {
     return Vue.axios({
       method: 'patch',
       url: url,
-      data: qs.stringify(data)
+      data: data
     })
   },
 
@@ -52,7 +50,7 @@ export default {
     return Vue.axios({
       method: 'put',
       url: url,
-      data: qs.stringify(data)
+      data: data
     })
   },
 

@@ -1,18 +1,18 @@
 <template>
-    <Card class="card" title="挂号单 - 118037910008">
+    <Card class="card" :title="headerText">
       <Layout>
         <Content class="info-header gray-bg">
           <BasicInfo>
             <div slot="patient-info">
-              <div>患者姓名: 王启航</div>
+              <div>患者姓名: {{registration.patient_id.name}}</div>
               <div>患者年龄: 21</div>
               <div>患者性别: 男</div>
-              <div>挂号详情: 组件是可复用的 Vue 实例，且带有一个名字：在这个例子中是我们可以在一个通过 new Vue 创建的 Vue 根实例中，把这个组件作为自定义元素来使用。️</div>
+              <div>挂号详情: {{registration.detail}}</div>
             </div>
             <div slot="doctor-info">
-              <div>医生姓名: 我是门诊医生❤️</div>
+              <div>医生姓名: {{registration.outpatient_doctor_id.name}}️</div>
               <div>医生联系方式: 16621004280</div>
-              <div>医生主治: 不孕不育🧒👦不孕不育🧒👦不孕不育🧒👦不孕不育🧒👦不孕不育🧒👦不孕不育🧒👦</div>
+              <div>医生主治: {{registration.outpatient_doctor_id.major}}️</div>
             </div>
           </BasicInfo>
         </Content>
@@ -33,7 +33,7 @@
         </Footer>
       </Layout>
       <p slot="extra">
-        挂号时间: 2018/12/02 09:00
+        挂号时间:  {{registration.register_time | beijing}}
       </p>
     </Card>
 </template>
@@ -43,6 +43,8 @@ import BasicInfo from './basic/BasicInfo'
 import ExaminationTable from './visit/ExaminationTable'
 import PrescriptTable from './visit/PrescriptTable'
 import Summary from './visit/Summary'
+import APIUtil from '../services/APIUtil'
+import Util from '../services/Util'
 
 export default {
   name: 'Visit',
@@ -54,6 +56,8 @@ export default {
   },
   data () {
     return {
+      id: this.$route.params.id,
+      registration: Object,
       /*
        *{
        *  name: '',
@@ -76,6 +80,11 @@ export default {
       havePrescript: false
     }
   },
+  computed: {
+    headerText () {
+      return '挂号单 - ' + this.id
+    }
+  },
   methods: {
     /**
      * 检查单数据变化
@@ -86,7 +95,10 @@ export default {
       selection.forEach(item => {
         this.examinationSummary.push({
           name: item.name,
-          price: item.price
+          price: item.price,
+          medical_doctor_id: item.medical_doctor_id,
+          description: item.description,
+          medical_doctor_name: item.medical_doctor
         })
       })
       this.haveExamination = this.examinationSummary.length !== 0
@@ -103,7 +115,9 @@ export default {
           name: item.name,
           price: item.price,
           number: item.number,
-          summary: item.price * item.number
+          summary: item.price * item.number,
+          pharmacy_id: item.pharmacy_id,
+          pharmacy: item.pharmacy
         })
       })
       this.havePrescript = this.prescriptSummary.length !== 0
@@ -113,11 +127,61 @@ export default {
      * 确认诊断
      */
     confirm () {
+      /*
+       * 生成检查单
+       */
+      if (this.haveExamination) {
+        let data = this.examinationSummary.pop()
 
+        APIUtil.post('Examination', {
+          'timestamp': Util.unix(),
+          'detail': '检查项目： ' + data.name + ';检查价格： ' + data.price + ';检查医生： ' + data.medical_doctor_name,
+          'patient_id': {'id': this.id, 'type': 'Patient'},
+          'outpatient_doctor_id': {'id': this.registration.outpatient_doctor_id.id, 'type': 'outpatientdoctor'},
+          'medical_doctor_id': {'id': data.medical_doctor_id, 'type': 'medicaldoctor'}
+        }).then(response => {
+          if (response.status === 200) {
+            // TODO callback
+          }
+        })
+      }
+
+      /*
+       * 生成处方
+       */
+      if (this.havePrescript) {
+        let detail = ''
+        let pharmacyId = ''
+        this.prescriptSummary.forEach(item => {
+          pharmacyId = item.pharmacy_id
+          detail += item.pharmacy + ' ==> ' + item.name + ' * ' + item.number + '  ' + item.description + ';'
+        })
+
+        APIUtil.post('Prescript', {
+          'timestamp': Util.unix(),
+          'detail': detail,
+          'patient_id': {'id': this.id, 'type': 'Patient'},
+          'outpatient_doctor_id': {'id': this.registration.outpatient_doctor_id.id, 'type': 'outpatientdoctor'},
+          'pharmacy_id': {'id': pharmacyId, 'type': 'pharmacy'}
+        }).then(response => {
+          if (response.status === 200) {
+            // TODO callback
+          }
+        })
+      }
+    },
+
+    payment (type, number, id) {
+      // TODO Payment怎么生成
     }
 
   },
   mounted () {
+    APIUtil.get('Registration/' + this.id).then(response => {
+      if (response.status === 200) {
+        this.registration = response.data
+      }
+    })
   }
 }
 </script>

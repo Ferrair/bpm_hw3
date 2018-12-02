@@ -10,11 +10,11 @@
       <Layout :style="{minHeight: '100vh'}">
         <Sider :style="{padding:'10px 0'}" class="white-bg">
           <Menu ref="menu" :theme="'light'" active-name="'visit'" width="auto" @on-select="onSelected">
-              <MenuItem name="visit">
+              <MenuItem name="Visit">
                 <Icon type="md-document" />
                 <span>就诊</span>
               </MenuItem>
-              <MenuItem name="examination">
+              <MenuItem name="Examination">
                 <Icon type="md-pulse" />
                 <span>检查</span>
               </MenuItem>
@@ -31,10 +31,14 @@
 </template>
 
 <script>
+import APIUtil from './services/APIUtil'
+import Util from './services/Util'
+
 export default {
   name: 'App',
   data () {
     return {
+      lastCount: 0
     }
   },
   computed: {
@@ -45,8 +49,74 @@ export default {
      * @param name router's name
      */
     onSelected (name) {
-      this.$router.push(name)
+      this.$router.push({
+        name: name,
+        params: {
+          id: '1542702390155'
+        }
+      })
+    },
+    /**
+     * 手动检查Registration信息是否更新
+     */
+    checkUpdate () {
+      APIUtil.get('Registration').then(response => {
+        if (response.status === 200) {
+          let list = response.data.Registration
+          /*
+           * If count is not equal, get its last item
+           */
+          if (this.lastCount !== 0 && list.length !== this.lastCount) {
+            this.sendNotice(list[list.length - 1])
+          }
+          /*
+           * Update lastCount
+           */
+          this.lastCount = list.length
+        }
+      })
+    },
+    /**
+     * 发送全局通知
+     */
+    sendNotice (newRegistration) {
+      let id = newRegistration.id
+      let patientName = newRegistration.patient_id.name
+      let registerTime = newRegistration.register_time * 1000
+      this.$Notice.info({
+        title: '就诊信息 - ' + id,
+        name: id,
+        duration: 0,
+        render: createElement => {
+          return createElement('div', {
+            style: {
+              lineHeight: 1.5
+            },
+            on: {
+              click: () => {
+                this.$router.push({
+                  name: 'Visit',
+                  params: {
+                    id: id
+                  }
+                })
+                this.$Notice.close(id)
+              }
+            }
+          },
+          [
+            createElement('p', ['病人姓名: ' + patientName]),
+            createElement('p', ['挂号时间: ' + Util.timeStampFormatter(registerTime)])
+          ])
+        }
+      })
     }
+  },
+  mounted () {
+    /*
+     * 不断请求API，查看是否有更新
+     */
+    // setInterval(() => this.checkUpdate(), 2000)
   }
 }
 </script>
