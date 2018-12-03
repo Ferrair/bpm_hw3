@@ -1,8 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Visit from '@/components/Visit'
+import VisitList from '@/components/VisitList'
+import ExaminationList from '@/components/ExaminationList'
 import Examination from '@/components/Examination'
 import Home from '@/components/Home'
+import Login from '@/components/Login'
 
 Vue.use(Router)
 
@@ -14,6 +17,11 @@ export default new Router({
       component: Visit
     },
     {
+      path: '/visit-list',
+      name: 'VisitList',
+      component: VisitList
+    },
+    {
       path: '/',
       name: 'Home',
       component: Home
@@ -22,6 +30,16 @@ export default new Router({
       path: '/examination/:id?',
       name: 'Examination',
       component: Examination
+    },
+    {
+      path: '/examination-list',
+      name: 'ExaminationList',
+      component: ExaminationList
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: Login
     }
   ]
 })

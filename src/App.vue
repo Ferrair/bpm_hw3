@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <div class="layout">
+    <Layout v-if="!isLogin" style="height: 900px">
+      <Login/>
+    </Layout>
+
+    <div v-if="isLogin" class="layout">
       <Header>
         <div class="layout-logo"></div>
         <div class="layout-title">
@@ -10,21 +14,19 @@
       <Layout :style="{minHeight: '100vh'}">
         <Sider :style="{padding:'10px 0'}" class="white-bg">
           <Menu ref="menu" :theme="'light'" active-name="'visit'" width="auto" @on-select="onSelected">
-              <MenuItem name="Visit">
+              <MenuItem v-if="role==='outpatient'" name="VisitList">
                 <Icon type="md-document" />
                 <span>就诊</span>
               </MenuItem>
-              <MenuItem name="Examination">
+              <MenuItem v-if="role==='medical'" name="ExaminationList">
                 <Icon type="md-pulse" />
                 <span>检查</span>
               </MenuItem>
           </Menu>
         </Sider>
-        <Layout>
           <Content :style="{padding: '10px 16px 16px'}">
               <router-view/>
           </Content>
-        </Layout>
       </Layout>
     </div>
   </div>
@@ -33,15 +35,22 @@
 <script>
 import APIUtil from './services/APIUtil'
 import Util from './services/Util'
+import { mapGetters } from 'vuex'
+import Login from './components/Login'
 
 export default {
   name: 'App',
+  components: {Login},
   data () {
     return {
       lastCount: 0
     }
   },
   computed: {
+    ...mapGetters([
+      'isLogin',
+      'role'
+    ])
   },
   methods: {
     /**
@@ -50,36 +59,86 @@ export default {
      */
     onSelected (name) {
       this.$router.push({
-        name: name,
-        params: {
-          id: '1542702390155'
-        }
+        name: name
       })
     },
     /**
      * 手动检查Registration信息是否更新
      */
     checkUpdate () {
-      APIUtil.get('Registration').then(response => {
-        if (response.status === 200) {
-          let list = response.data.Registration
-          /*
-           * If count is not equal, get its last item
-           */
-          if (this.lastCount !== 0 && list.length !== this.lastCount) {
-            this.sendNotice(list[list.length - 1])
+      if (this.role === 'outpatient') {
+        APIUtil.get('Registration').then(response => {
+          if (response.status === 200) {
+            let list = response.data.Registration
+            /*
+             * If count is not equal, get its last item
+             */
+            if (this.lastCount !== 0 && list.length !== this.lastCount) {
+              this.sendNoticeRegistration(list[list.length - 1])
+            }
+            /*
+             * Update lastCount
+             */
+            this.lastCount = list.length
           }
-          /*
-           * Update lastCount
-           */
-          this.lastCount = list.length
+        })
+      } else if (this.role === 'medical') {
+        APIUtil.get('Examination').then(response => {
+          if (response.status === 200) {
+            let list = response.data.Examination
+            /*
+             * If count is not equal, get its last item
+             */
+            if (this.lastCount !== 0 && list.length !== this.lastCount) {
+              this.sendNoticeExamination(list[list.length - 1])
+            }
+            /*
+             * Update lastCount
+             */
+            this.lastCount = list.length
+          }
+        })
+      }
+    },
+    /**
+     * 发送全局通知
+     */
+    sendNoticeExamination (newExamination) {
+      let id = newExamination.id
+      let patientName = newExamination.patient_id.name
+      let examinationTime = newExamination.timestamp * 1000
+      this.$Notice.info({
+        title: '挂号单 - ' + id,
+        name: id,
+        duration: 0,
+        render: createElement => {
+          return createElement('div', {
+            style: {
+              lineHeight: 1.5
+            },
+            on: {
+              click: () => {
+                this.$router.push({
+                  name: 'Examination',
+                  params: {
+                    id: id
+                  }
+                })
+                this.$Notice.close(id)
+              }
+            }
+          },
+          [
+            createElement('p', ['病人姓名: ' + patientName]),
+            createElement('p', ['开单时间: ' + Util.timeStampFormatter(examinationTime)])
+          ])
         }
       })
     },
     /**
      * 发送全局通知
      */
-    sendNotice (newRegistration) {
+    sendNoticeRegistration (newRegistration) {
       let id = newRegistration.id
       let patientName = newRegistration.patient_id.name
       let registerTime = newRegistration.register_time * 1000
