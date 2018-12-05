@@ -26,7 +26,7 @@
         </Content>
         <Divider v-if="haveExamination||havePrescript">综合</Divider>
         <Content v-if="haveExamination||havePrescript" class="info-payment">
-          <Summary :examination="examinationSummary" :prescript="prescriptSummary"/>
+          <Summary :examination="examinationSummary" :prescript="prescriptSummary" @totalPriceChange="totalPriceChange"/>
         </Content>
         <Footer v-if="haveExamination||havePrescript" class="info-operation">
           <Button type="success" @click="confirm">确认诊断</Button>
@@ -45,6 +45,7 @@ import PrescriptTable from './visit/PrescriptTable'
 import Summary from './visit/Summary'
 import APIUtil from '../services/APIUtil'
 import Util from '../services/Util'
+import Vue from 'vue'
 
 export default {
   name: 'Visit',
@@ -77,7 +78,8 @@ export default {
        */
       prescriptSummary: [],
       haveExamination: false,
-      havePrescript: false
+      havePrescript: false,
+      summary: 0
     }
   },
   computed: {
@@ -86,6 +88,9 @@ export default {
     }
   },
   methods: {
+    totalPriceChange (summary) {
+      this.summary = summary
+    },
     /**
      * 检查单数据变化
      * @param selection 所有选择的数据
@@ -122,57 +127,119 @@ export default {
       })
       this.havePrescript = this.prescriptSummary.length !== 0
     },
+    /**
+     * 处方数据的Payload
+     */
+    _prescriptPayload () {
+      let detail = ''
+      let pharmacyId = ''
+      this.prescriptSummary.forEach(item => {
+        pharmacyId = item.pharmacy_id
+        detail += item.pharmacy + ' ==> ' + item.name + ' * ' + item.number + '  ' + item.description + ';'
+      })
+      return {
+        'timestamp': Util.unix(),
+        'detail': detail,
+        'patient_id': {'id': this.registration.patient_id.id, 'type': 'Patient'},
+        'outpatient_doctor_id': {'id': this.registration.outpatient_doctor_id.id, 'type': 'outpatientdoctor'},
+        'pharmacy_id': {'id': pharmacyId, 'type': 'pharmacy'}
+      }
+    },
+    /**
+     * 检查单数据的Payload
+     */
+    _examinationPayload () {
+      let data = this.examinationSummary[0]
+      return {
+        'timestamp': Util.unix(),
+        'detail': '检查项目： ' + data.name + ';检查价格： ' + data.price + ';检查医生： ' + data.medical_doctor_name,
+        'patient_id': {'id': this.registration.patient_id.id, 'type': 'Patient'},
+        'outpatient_doctor_id': {'id': this.registration.outpatient_doctor_id.id, 'type': 'outpatientdoctor'},
+        'medical_doctor_id': {'id': data.medical_doctor_id, 'type': 'medicaldoctor'}
+      }
+    },
 
     /**
      * 确认诊断
      */
     confirm () {
       /*
-       * 生成检查单
+       * 单独生成检查单
        */
-      if (this.haveExamination) {
-        let data = this.examinationSummary.pop()
-
-        APIUtil.post('Examination', {
-          'timestamp': Util.unix(),
-          'detail': '检查项目： ' + data.name + ';检查价格： ' + data.price + ';检查医生： ' + data.medical_doctor_name,
-          'patient_id': {'id': this.id, 'type': 'Patient'},
-          'outpatient_doctor_id': {'id': this.registration.outpatient_doctor_id.id, 'type': 'outpatientdoctor'},
-          'medical_doctor_id': {'id': data.medical_doctor_id, 'type': 'medicaldoctor'}
-        }).then(response => {
+      if (this.haveExamination && !this.havePrescript) {
+        let payload = this._examinationPayload()
+        APIUtil.post('Examination', payload).then(response => {
           if (response.status === 200) {
-            // TODO callback
+            alert('检查单已经生成')
+            this.payment('Examination', this.summary, {examination_id: response.data.id})
           }
         })
       }
 
       /*
-       * 生成处方
+       * 单独生成处方
        */
-      if (this.havePrescript) {
-        let detail = ''
-        let pharmacyId = ''
-        this.prescriptSummary.forEach(item => {
-          pharmacyId = item.pharmacy_id
-          detail += item.pharmacy + ' ==> ' + item.name + ' * ' + item.number + '  ' + item.description + ';'
-        })
+      if (!this.haveExamination && this.havePrescript) {
+        let payload = this._prescriptPayload()
 
-        APIUtil.post('Prescript', {
-          'timestamp': Util.unix(),
-          'detail': detail,
-          'patient_id': {'id': this.id, 'type': 'Patient'},
-          'outpatient_doctor_id': {'id': this.registration.outpatient_doctor_id.id, 'type': 'outpatientdoctor'},
-          'pharmacy_id': {'id': pharmacyId, 'type': 'pharmacy'}
-        }).then(response => {
+        APIUtil.post('Prescript', payload).then(response => {
           if (response.status === 200) {
-            // TODO callback
+            alert('处方已经生成')
+            this.payment('Prescript', this.summary, {prescript_id: response.data.id})
           }
         })
       }
+      /*
+       * 共同生成检查单和处方
+       */
+      if (this.haveExamination && this.havePrescript) {
+        Vue.axios.all([APIUtil.post('Prescript', this._prescriptPayload()), APIUtil.post('Examination', this._examinationPayload())])
+          .then(Vue.axios.spread((res1, res2) => {
+            alert('处方+检查单同时已经生成')
+            this.payment('Both', this.summary, {prescript_id: res1.data.id, examination_id: res2.data.id})
+          }))
+      }
     },
+    /**
+     *
+     * @param type 'Examination' | 'Prescript' | 'Both'
+     * @param number
+     * @param ids 检查单或者处方ID
+     */
+    payment (type, number, ids) {
+      let payload = {
+        'timestamp': Util.unix(),
+        'type': type,
+        'status': 'unpaid',
+        'number': number,
+        'patient_id': {'id': this.registration.patient_id.id, 'type': 'Patient'},
+        'outpatient_doctor_id': {'id': this.registration.outpatient_doctor_id.id, 'type': 'outpatientdoctor'}
+      }
+      if (ids.prescript_id) {
+        payload.prescript_id = {'id': ids.prescript_id, 'type': 'prescript'}
+      }
+      if (ids.examination_id) {
+        payload.examination_id = {'id': ids.examination_id, 'type': 'examination'}
+      }
 
-    payment (type, number, id) {
-      // TODO Payment怎么生成
+      APIUtil.post('Payment', payload).then(response => {
+        if (response.status === 200) {
+          alert('缴费单已经生成, 价格：' + number)
+          this.updateRegistration()
+        }
+      })
+    },
+    /**
+     * 将Registration修改，便于前端进行Listen
+     */
+    updateRegistration () {
+      let payload = this.registration
+      payload.status = 'Payment'
+      APIUtil.put('Registration/' + this.registration.id, payload).then(response => {
+        if (response.status === 200) {
+          console.log('UpdateRegistration')
+        }
+      })
     }
 
   },
@@ -187,7 +254,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="less" scoped>
+<style lang="scss" scoped>
   @import "../scss/index.css";
 
   .info-header {

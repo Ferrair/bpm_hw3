@@ -33,7 +33,7 @@ export default {
         {
           title: '数量 (盒/支)',
           width: 150,
-          key: 'number',
+          key: 'defaultNumber',
           render: (createElement, params) => {
             /**
              * dom DOM元素
@@ -49,7 +49,7 @@ export default {
                 },
                 on: {
                   input: (event) => {
-                    // TODO 怎么更新Data https://cn.vuejs.org/v2/guide/render-function.html
+                    this.prescript_data[params.index].number = event
                   }
                 }
               })
@@ -70,18 +70,18 @@ export default {
         {
           name: '阿莫西林',
           price: 30,
-          number: 2,
+          defaultNumber: 1, // default value
           description: '一天两次，早晚饭前使用',
           pharmacy: '药房1',
-          pharmacy_id: ''
+          pharmacy_id: 1542701091197
         },
         {
           name: '头孢拉定',
           price: 50,
-          number: 2,
+          defaultNumber: 1, // default value
           description: '一天一次，睡前使用',
           pharmacy: '药房1',
-          pharmacy_id: ''
+          pharmacy_id: 1542701091197
         }
       ]
     }

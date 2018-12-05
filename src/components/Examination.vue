@@ -15,14 +15,17 @@
           </div>
         </BasicInfo>
       </Content>
-      <Divider>检查结果</Divider>
-      <Content class="info-examination-result">
-        <ExaminationResult @onResultChange="onResultChange"/>
-      </Content>
-      <Footer class="info-operation">
-        <Button type="success" @click="confirm(false)">检查结束</Button>
-        <Button type="warning" @click="confirm(true)" style="margin-left: 20px">再次检查</Button>
-      </Footer>
+      <Button v-if="!started" type="success" class="start-button" @click="startExamination">开始检查</Button>
+      <div v-if="started">
+        <Divider>检查结果</Divider>
+        <Content class="info-examination-result">
+          <ExaminationResult @onResultChange="onResultChange"/>
+        </Content>
+        <Footer class="info-operation">
+          <Button type="success" @click="confirm(false)">检查结束</Button>
+          <Button type="warning" @click="confirm(true)" style="margin-left: 20px">再次检查</Button>
+        </Footer>
+      </div>
     </Layout>
     <p slot="extra">
       检查时间: {{examination.timestamp | beijing}}
@@ -46,7 +49,8 @@ export default {
     return {
       id: this.$route.params.id,
       examination: Object,
-      result: ''
+      result: '',
+      started: false
     }
   },
   computed: {
@@ -67,7 +71,7 @@ export default {
         'medical_doctor_id': {'id': this.examination.medical_doctor_id.id, 'type': 'medicaldoctor'}
       }).then(response => {
         if (response.status === 200) {
-          // TODO callback
+          alert('检查完成')
         }
       })
     },
@@ -76,6 +80,10 @@ export default {
      */
     onResultChange (result) {
       this.result = result
+    },
+
+    startExamination () {
+      this.started = true
     }
   },
   mounted () {
@@ -100,5 +108,9 @@ export default {
   }
   .info-operation{
     height: auto;
+  }
+  .start-button{
+    margin: 20px;
+    padding: 10px;
   }
 </style>

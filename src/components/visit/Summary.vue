@@ -32,6 +32,7 @@ export default {
       this.prescript.forEach(item => {
         total += item.summary
       })
+      this.$emit('totalPriceChange', total)
       return total
     }
   }

@@ -40,44 +40,45 @@ export default {
           key: 'description'
         }
       ],
+      // TODO update IDs
       examination_data: [
         {
           name: 'CT检查',
           price: 180,
           medical_doctor: '王医生',
           description: '一些介绍吧，显的界面丰满一点',
-          medical_doctor_id: ''
+          medical_doctor_id: 1542701001887
         },
         {
           name: '血常规',
           price: 100,
           medical_doctor: '简医生',
           description: '一些介绍吧，显的界面丰满一点',
-          medical_doctor_id: ''
+          medical_doctor_id: 1542701001887
         }, {
           name: '核磁共振',
           price: 1080,
           medical_doctor: '陈医生',
           description: '一些介绍吧，显的界面丰满一点',
-          medical_doctor_id: ''
+          medical_doctor_id: 1542701001887
         }, {
           name: '肝功能',
           price: 50,
           medical_doctor: '郑医生',
           description: '一些介绍吧，显的界面丰满一点',
-          medical_doctor_id: ''
+          medical_doctor_id: 1542701001887
         }, {
           name: 'B超',
           price: 800,
           medical_doctor: '宋医生',
           description: '一些介绍吧，显的界面丰满一点',
-          medical_doctor_id: ''
+          medical_doctor_id: 1542701001887
         }, {
           name: '心电图',
           price: 900,
           medical_doctor: '何医生',
           description: '一些介绍吧，显的界面丰满一点',
-          medical_doctor_id: ''
+          medical_doctor_id: 1542701001887
         }
       ]
     }
