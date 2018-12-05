@@ -1,17 +1,17 @@
 <template>
-  <Card class="card" title="检查单 - 118037910008">
+  <Card class="card" :title="headerText">
     <Layout>
       <Content class="info-header gray-bg">
         <BasicInfo>
           <div slot="patient-info">
-            <div>患者姓名: {{examination.patient_id.name}}</div>
-            <div>患者年龄: 21</div>
-            <div>患者性别: 男</div>
-            <div>检查单详情: {{examination.detail}}</div>
+            <div><strong>患者姓名: </strong>{{examination.patient_id.name}}</div>
+            <div><strong>患者年龄: </strong>21</div>
+            <div><strong>患者性别: </strong>男</div>
+            <div><strong>检查单详情: </strong>{{examination.detail}}</div>
           </div>
           <div slot="doctor-info">
-            <div>医生姓名: {{examination.medical_doctor_id.name}}️</div>
-            <div>医生联系方式: 16621004280</div>
+            <div><strong>医生姓名: </strong>{{examination.medical_doctor_id.name}}️</div>
+            <div><strong>医生联系方式:</strong> 16621004280</div>
           </div>
         </BasicInfo>
       </Content>
@@ -22,8 +22,8 @@
           <ExaminationResult @onResultChange="onResultChange"/>
         </Content>
         <Footer class="info-operation">
-          <Button type="success" @click="confirm(false)">检查结束</Button>
-          <Button type="warning" @click="confirm(true)" style="margin-left: 20px">再次检查</Button>
+          <Button :disabled="finished" type="success" @click="confirm(false)">检查结束</Button>
+          <Button :disabled="finished" type="warning" @click="confirm(true)" style="margin-left: 20px">再次检查</Button>
         </Footer>
       </div>
     </Layout>
@@ -50,7 +50,8 @@ export default {
       id: this.$route.params.id,
       examination: Object,
       result: '',
-      started: false
+      started: false,
+      finished: false
     }
   },
   computed: {
@@ -68,10 +69,12 @@ export default {
         'timestamp': Util.unix(),
         'need_re_examination': reExamination ? 'Yes' : 'No',
         'patient_id_1': {'id': this.examination.patient_id.id, 'type': 'Patient'},
+        'examination_id': {'id': this.examination.id, 'type': 'examination'},
         'medical_doctor_id': {'id': this.examination.medical_doctor_id.id, 'type': 'medicaldoctor'}
       }).then(response => {
         if (response.status === 200) {
           alert('检查完成')
+          this.finished = true
         }
       })
     },

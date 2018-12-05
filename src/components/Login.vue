@@ -35,6 +35,13 @@ export default {
         this.$router.push({
           name: 'ExaminationList'
         })
+      } else if (this.name === 'pharmacy' && this.password === '123456') {
+        // 药房
+        this.$store.dispatch('changeLoginState', true)
+        this.$store.dispatch('changeRole', 'pharmacy')
+        this.$router.push({
+          name: 'PrescriptList'
+        })
       }
     }
   }

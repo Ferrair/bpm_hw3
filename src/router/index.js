@@ -4,6 +4,8 @@ import Visit from '@/components/Visit'
 import VisitList from '@/components/VisitList'
 import ExaminationList from '@/components/ExaminationList'
 import Examination from '@/components/Examination'
+import PrescriptList from '@/components/PrescriptList'
+import Prescript from '@/components/Prescript'
 import Home from '@/components/Home'
 import Login from '@/components/Login'
 
@@ -35,6 +37,16 @@ export default new Router({
       path: '/examination-list',
       name: 'ExaminationList',
       component: ExaminationList
+    },
+    {
+      path: '/prescript-list',
+      name: 'PrescriptList',
+      component: PrescriptList
+    },
+    {
+      path: '/prescript/:id?',
+      name: 'Prescript',
+      component: Prescript
     },
     {
       path: '/login',

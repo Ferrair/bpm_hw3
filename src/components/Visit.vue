@@ -4,15 +4,15 @@
         <Content class="info-header gray-bg">
           <BasicInfo>
             <div slot="patient-info">
-              <div>患者姓名: {{registration.patient_id.name}}</div>
-              <div>患者年龄: 21</div>
-              <div>患者性别: 男</div>
-              <div>挂号详情: {{registration.detail}}</div>
+              <div><strong>患者姓名:</strong> {{registration.patient_id.name}}</div>
+              <div><strong>患者年龄:</strong> 21</div>
+              <div><strong>患者性别:</strong> 男</div>
+              <div><strong>挂号详情:</strong> {{registration.detail}}</div>
             </div>
             <div slot="doctor-info">
-              <div>医生姓名: {{registration.outpatient_doctor_id.name}}️</div>
-              <div>医生联系方式: 16621004280</div>
-              <div>医生主治: {{registration.outpatient_doctor_id.major}}️</div>
+              <div><strong>医生姓名: </strong>{{registration.outpatient_doctor_id.name}}️</div>
+              <div><strong>医生联系方式:</strong> 16621004280</div>
+              <div><strong>医生主治:</strong> {{registration.outpatient_doctor_id.major}}️</div>
             </div>
           </BasicInfo>
         </Content>
@@ -122,7 +122,8 @@ export default {
           number: item.number,
           summary: item.price * item.number,
           pharmacy_id: item.pharmacy_id,
-          pharmacy: item.pharmacy
+          pharmacy: item.pharmacy,
+          description: item.description
         })
       })
       this.havePrescript = this.prescriptSummary.length !== 0
@@ -135,7 +136,7 @@ export default {
       let pharmacyId = ''
       this.prescriptSummary.forEach(item => {
         pharmacyId = item.pharmacy_id
-        detail += item.pharmacy + ' ==> ' + item.name + ' * ' + item.number + '  ' + item.description + ';'
+        detail += item.pharmacy + ' ==> ' + item.name + ' * ' + item.number + '  （' + item.description + '）;'
       })
       return {
         'timestamp': Util.unix(),

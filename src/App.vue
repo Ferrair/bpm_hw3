@@ -22,6 +22,10 @@
                 <Icon type="md-pulse" />
                 <span>检查</span>
               </MenuItem>
+            <MenuItem v-if="role==='pharmacy'" name="PrescriptList">
+              <Icon type="md-pulse" />
+              <span>开药</span>
+            </MenuItem>
           </Menu>
         </Sider>
           <Content :style="{padding: '10px 16px 16px'}">
@@ -98,6 +102,22 @@ export default {
             this.lastCount = list.length
           }
         })
+      } else if (this.role === 'pharmacy') {
+        APIUtil.get('Prescript').then(response => {
+          if (response.status === 200) {
+            let list = response.data.Prescript
+            /*
+             * If count is not equal, get its last item
+             */
+            if (this.lastCount !== 0 && list.length !== this.lastCount) {
+              this.sendNoticePrescript(list[list.length - 1])
+            }
+            /*
+             * Update lastCount
+             */
+            this.lastCount = list.length
+          }
+        })
       }
     },
     /**
@@ -166,6 +186,41 @@ export default {
           [
             createElement('p', ['病人姓名: ' + patientName]),
             createElement('p', ['挂号时间: ' + Util.timeStampFormatter(registerTime)])
+          ])
+        }
+      })
+    },
+    /**
+     * 发送全局通知
+     */
+    sendNoticePrescript (newPrescript) {
+      let id = newPrescript.id
+      let patientName = newPrescript.patient_id.name
+      let registerTime = newPrescript.register_time * 1000
+      this.$Notice.info({
+        title: '处方信息 - ' + id,
+        name: id,
+        duration: 0,
+        render: createElement => {
+          return createElement('div', {
+            style: {
+              lineHeight: 1.5
+            },
+            on: {
+              click: () => {
+                this.$router.push({
+                  name: 'Prescript',
+                  params: {
+                    id: id
+                  }
+                })
+                this.$Notice.close(id)
+              }
+            }
+          },
+          [
+            createElement('p', ['病人姓名: ' + patientName]),
+            createElement('p', ['开方时间: ' + Util.timeStampFormatter(registerTime)])
           ])
         }
       })
