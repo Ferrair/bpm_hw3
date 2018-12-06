@@ -27,6 +27,22 @@ export default {
   },
 
   /**
+   * post请求封装方案
+   * @param url {string} 请求路径
+   * @param formData {object} 请求的数据
+   * @returns {Promise} Promise对象，用于异步请求
+   */
+  postFormData (url, formData) {
+    return Vue.axios({
+      method: 'post',
+      url: url,
+      data: formData,
+      contentType: false,
+      processData: false
+    })
+  },
+
+  /**
    * patch请求封装方案
    * @param url {string} 请求路径
    * @param data {object} 请求的数据

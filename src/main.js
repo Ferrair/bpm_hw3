@@ -10,6 +10,7 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import APIUtil from './services/APIUtil'
 import Util from './services/Util'
+import PDFGenerator from './services/PDFGenerator'
 import store from './store'
 
 Vue.config.productionTip = false
@@ -17,6 +18,7 @@ Vue.use(iView)
 Vue.use(VueLodash) // Vue._.
 Vue.use(VueAxios, axios)
 Vue.use(require('vue-moment'))
+Vue.use(PDFGenerator)
 
 APIUtil.init()
 

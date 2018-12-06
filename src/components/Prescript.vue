@@ -1,6 +1,6 @@
 <template>
     <div>
-      <Card class="card" :title="headerText">
+      <Card id="pdf" class="card" :title="headerText">
         <Layout>
           <Content class="info-header gray-bg">
             <BasicInfo>
@@ -63,6 +63,19 @@ export default {
     startPrescript () {
       this.started = true
     },
+    /**
+     * 生成报告
+     * @param id: 检查结果数据
+     */
+    generateReport (id) {
+      this.generatePDF(id, file => {
+        let fd = new FormData()
+        fd.append(id, file)
+        APIUtil.postFormData('Drugresult/' + id, fd).then(response => {
+          console.log(response.data)
+        })
+      })
+    },
     confirm () {
       APIUtil.post('Drugresult', {
         'detail': this.result,
@@ -73,6 +86,7 @@ export default {
       }).then(response => {
         if (response.status === 200) {
           alert('取药结束，病人已经拿药了')
+          this.generateReport(response.data.id)
         }
       })
     }
