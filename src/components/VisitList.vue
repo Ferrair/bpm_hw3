@@ -44,7 +44,9 @@ export default {
   mounted () {
     APIUtil.get('Registration').then(response => {
       if (response.status === 200) {
-        this.registrationList = response.data.Registration
+        this.registrationList = response.data.Registration.sort((a, b) => {
+          return b.register_time - a.register_time
+        })
       }
     })
   }

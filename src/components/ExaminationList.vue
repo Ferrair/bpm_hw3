@@ -45,7 +45,9 @@ export default {
   mounted () {
     APIUtil.get('Examination').then(response => {
       if (response.status === 200) {
-        this.examinationList = response.data.Examination
+        this.examinationList = response.data.Examination.sort((a, b) => {
+          return b.timestamp - a.timestamp
+        })
       }
     })
   }

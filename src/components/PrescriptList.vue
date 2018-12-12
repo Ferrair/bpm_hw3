@@ -45,7 +45,9 @@ export default {
   mounted () {
     APIUtil.get('Prescript').then(response => {
       if (response.status === 200) {
-        this.prescriptList = response.data.Prescript
+        this.prescriptList = response.data.Prescript.sort((a, b) => {
+          return b.timestamp - a.timestamp
+        })
       }
     })
   }
