@@ -230,7 +230,7 @@ export default {
     /*
      * 不断请求API，查看是否有更新
      */
-    // setInterval(() => this.checkUpdate(), 2000)
+    setInterval(() => this.checkUpdate(), 2000)
   }
 }
 </script>

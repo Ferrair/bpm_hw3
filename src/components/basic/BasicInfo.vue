@@ -28,16 +28,10 @@
 <script>
 export default {
   name: 'BasicInfo',
-  props: {
-    /*
-     * 医生的类别：outpatient|medical
-     */
-    doctorType: String
-  },
   data () {
     return {
       patientImage: require('../../assets/avatar.png'),
-      doctorImage: this.doctorType === 'outpatient' ? require('../../assets/avatar.png') : require('../../assets/avatar.png')
+      doctorImage: require('../../assets/doctor1.jpeg')
     }
   }
 }

@@ -1,10 +1,10 @@
 <template>
     <div>
       <div class="examination-image-area">
-        <img class="examination-image" src='../../assets/avatar.png'>
-        <img class="examination-image" src='../../assets/avatar.png'>
-        <img class="examination-image" src='../../assets/avatar.png'>
-        <img class="examination-image" src='../../assets/avatar.png'>
+        <img class="examination-image" src='../../assets/pic1.jpeg'>
+        <img class="examination-image" src='../../assets/pic2.jpeg'>
+        <img class="examination-image" src='../../assets/pic3.jpeg'>
+        <img class="examination-image" src='../../assets/pic4.jpeg'>
       </div>
       <Input class="examination-text" v-model="examinationResult" type="textarea" :rows="6" placeholder="输入检查结果" />
     </div>

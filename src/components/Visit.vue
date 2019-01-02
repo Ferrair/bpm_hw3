@@ -2,7 +2,7 @@
     <Card class="card" :title="headerText">
       <Layout>
         <Content class="info-header gray-bg">
-          <BasicInfo>
+          <BasicInfo >
             <div slot="patient-info">
               <div><strong>患者姓名:</strong> {{registration.patient_id.name}}</div>
               <div><strong>患者年龄:</strong> 21</div>
